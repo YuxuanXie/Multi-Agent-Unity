@@ -1,0 +1,10 @@
+__pycache__
+*.app
+*.pyc
+*.debug
+*.x86_64
+*.so
+al_linux_Data
+.DS_Store
+log
+results
