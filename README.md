@@ -16,5 +16,6 @@ python training.py
 ## conda
 ``` shell
 conda env create -f environment.yml
+conda activate unity
 python training.py
 ```
