@@ -36,10 +36,10 @@ RUN pip3 install mlagents==0.18.0
 # #### install pytorch
 # #### -------------------------------------------------------------------
 # RUN pip3 install torch==1.4.0+cu92  torchvision==0.5.0+cu92 -f https://download.pytorch.org/whl/torch_stable.html  -i https://pypi.douban.com/simple/
-# RUN pip install torch==1.5.0+cu92 torchvision==0.6.0+cu92 -f https://download.pytorch.org/whl/torch_stable.html --default-timeout=1000 
-COPY . .
-RUN pip install torch-1.5.0+cu92-cp37-cp37m-linux_x86_64.whl 
-RUN rm -rf torch-1.5.0+cu92-cp37-cp37m-linux_x86_64.whl
+RUN pip install torch==1.5.0+cu92 torchvision==0.6.0+cu92 -f https://download.pytorch.org/whl/torch_stable.html 
+# COPY . .
+# RUN pip install torch-1.5.0+cu92-cp37-cp37m-linux_x86_64.whl 
+# RUN rm -rf torch-1.5.0+cu92-cp37-cp37m-linux_x86_64.whl
 
 # -i http://pypi.douban.com/simple/ --trusted-host=pypi.douban.com/simple ipython
 # ## -- Yuxuan 
