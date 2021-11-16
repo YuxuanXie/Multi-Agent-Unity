@@ -28,9 +28,6 @@ RUN add-apt-repository ppa:deadsnakes/ppa -y && apt-get update -y && apt install
 # # Python packages we use (or used at one point...)
 RUN pip3 install mlagents==0.18.0
 
-# # Solving slow pip
-# ENV http_proxy http://proxy-chain.xxx.com:911/
-# ENV https_proxy http://proxy-chain.xxx.com:912/ 
 
 # #### -------------------------------------------------------------------
 # #### install pytorch
@@ -40,9 +37,3 @@ RUN pip install torch==1.5.0+cu92 torchvision==0.6.0+cu92 -f https://download.py
 # COPY . .
 # RUN pip install torch-1.5.0+cu92-cp37-cp37m-linux_x86_64.whl 
 # RUN rm -rf torch-1.5.0+cu92-cp37-cp37m-linux_x86_64.whl
-
-# -i http://pypi.douban.com/simple/ --trusted-host=pypi.douban.com/simple ipython
-# ## -- Yuxuan 
-# RUN pip install tensorboardX -i https://pypi.douban.com/simple/
-
-# WORKDIR /pymarl
