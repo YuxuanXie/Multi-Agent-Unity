@@ -86,7 +86,6 @@ class unityEnv(MultiAgentEnv):
         done = {agent_id : True for agent_id in self.terminal_steps.agent_id}
         # obs.update(done_agents[0])
         reward.update(done_agents[1])
-        # import pdb; pdb.set_trace();
         
         # Get obs, reward, done, info for each agent
         return obs, reward, done, info

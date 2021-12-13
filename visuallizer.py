@@ -31,8 +31,10 @@ def main(args):
     alg = PPO(obs_shape, action_shape, config=config)
     
     alg.load_model(args.checkpoint, cuda=False)
+    
+    done_num = 0
 
-    for step in range(int(1e3)):
+    for step in range(int(2e3)):
         action = {}
 
         action, value, log_prob = alg.act(cur_obs)
@@ -40,6 +42,15 @@ def main(args):
 
         print(f"step = {step} obs = {len(cur_obs)} reward = {reward} done = {done.keys()}")
         cur_obs = next_obs
+
+        if done.keys():
+            done_num += 1
+            print("done")
+            if done_num == 2:
+                cur_obs = env.reset()
+                done_num = 0
+            # import pdb; pdb.set_trace()
+            # cur_obs = env.reset()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='arguments')
