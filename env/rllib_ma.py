@@ -3,6 +3,7 @@ from time import sleep
 from numpy import random
 from env.gym_wrapper import unityEnv
 from ray.rllib.env import MultiAgentEnv
+import logging  
 
 class Gc(MultiAgentEnv):
     def __init__(self, 
@@ -50,7 +51,7 @@ class Gc(MultiAgentEnv):
                 reward.pop(agent_id, None)
                 done.pop(agent_id, None)
                 info.pop(agent_id, None)
-        print(f"step = {self.current_step} actions = {actions.keys()} agent_id = {obs.keys()} done_agents = {self.done_agents} reward = {reward}")
+        logging.debug(f"step = {self.current_step} actions = {actions.keys()} agent_id = {obs.keys()} done_agents = {self.done_agents} reward = {reward}")
         if len(done):
             for agent_id in done.keys():
                 if done[agent_id] and agent_id is not "__all__" and agent_id not in self.done_agents:
