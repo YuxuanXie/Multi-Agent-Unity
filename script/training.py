@@ -28,10 +28,10 @@ ppo_params = {
     'use_gae': True,
     'kl_coeff': 0.0,
     "clip_param" : 0.1,
-    "sgd_minibatch_size" : 64,
-    "train_batch_size" : 64,
-    "num_sgd_iter" : 1,
-    "rollout_fragment_length" : 64,
+    "sgd_minibatch_size" : 2048,
+    "train_batch_size" : 1024,
+    "num_sgd_iter" : 4,
+    "rollout_fragment_length" : 128,
     "grad_clip" : 30,
     # "sgd_minibatch_size" : 128*5,
     # "train_batch_size" : 5000,
@@ -47,10 +47,10 @@ appo_param = {
     'use_gae': True,
     'kl_coeff': 0.0,
     "clip_param" : 0.1,
-    "train_batch_size" : 1024,
-    "minibatch_buffer_size" : 512,
+    "train_batch_size" : 2048,
+    "minibatch_buffer_size" : 1024,
     "num_sgd_iter" : 4,
-    "rollout_fragment_length" : 64,
+    "rollout_fragment_length" : 128,
     "grad_clip" : 30,
 }
 
@@ -58,9 +58,9 @@ appo_param = {
 def setup(args):
 
     def env_creator(_):
-        return Gc("/Users/yuxuan/git/maUnity/env/unity_envs/GcMaze.app", no_graphics=args.render, numKeyFirst=args.keyFir, numKeySecond=args.keySec, time_scale=args.speed)
+        return Gc(args.env_path, no_graphics=args.render, numKeyFirst=args.keyFir, numKeySecond=args.keySec, time_scale=args.speed)
 
-    single_env = Gc("/Users/yuxuan/git/maUnity/env/unity_envs/GcMaze.app")
+    single_env = Gc(args.env_path,)
     env_name = "gc_env"
     register_env(env_name, env_creator)
 
@@ -133,7 +133,6 @@ def setup(args):
                 "custom_model": "conv2mlp", 
                 "lstm_cell_size": 128 ,
                 "max_seq_len" : 8,
-                # "fc_size" : [256, 128, 32],
                 # "custom_model_config": {
                 #     "obs_shape" : 50,
                 #     "entity_shape" : 31,
@@ -170,12 +169,13 @@ def on_episode_end(info):
 def main():
     parser = argparse.ArgumentParser(description='Training script')
     parser.add_argument('--exp_name', default='gc', help='Name of the ray_results experiment directory where results are stored.')
-    parser.add_argument('--algorithm', default='APPO', help='Name of the rllib algorithm to use.')
+    parser.add_argument('--env_path', default='/Users/yuxuan/git/maUnity/env/unity_envs/GcMaze.app', help='Path to the game')
+    parser.add_argument('--algorithm', default='PPO', help='Name of the rllib algorithm to use.')
     parser.add_argument('--restore', default='', help='Path to the checkpoint restored.')
     parser.add_argument('--train_batch_size', default=1024, type=int, help='Size of the total dataset over which one epoch is computed.')
     parser.add_argument('--checkpoint_frequency', default=100, type=int, help='Number of steps before a checkpoint is saved.')
-    parser.add_argument('--training_iterations', default=200000, type=int, help='Total number of steps to train for')
-    parser.add_argument('--num_cpus', default=2, type=int, help='Number of available CPUs')
+    parser.add_argument('--training_iterations', default=20000, type=int, help='Total number of steps to train for')
+    parser.add_argument('--num_cpus', default=16, type=int, help='Number of available CPUs')
     parser.add_argument('--num_gpus', default=0, type=int, help='Number of available GPUs')
     parser.add_argument('--use_gpus_for_workers', action='store_true', help='Set to true to run workers on GPUs rather than CPUs')
     parser.add_argument('--use_gpu_for_driver', action='store_true', help='Set to true to run driver on GPU rather than CPU.')
