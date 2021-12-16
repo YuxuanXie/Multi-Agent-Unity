@@ -28,8 +28,8 @@ ppo_params = {
     'use_gae': True,
     'kl_coeff': 0.0,
     "clip_param" : 0.1,
-    "sgd_minibatch_size" : 2048,
-    "train_batch_size" : 1024,
+    "sgd_minibatch_size" : 1024,
+    "train_batch_size" : 2048,
     "num_sgd_iter" : 4,
     "rollout_fragment_length" : 128,
     "grad_clip" : 30,
@@ -183,7 +183,7 @@ def main():
     parser.add_argument('--num_cpus_for_driver', default=1., type=float, help='Number of workers to place on a single device (CPU or GPU)')
     parser.add_argument('--lam', default=0.95, type=float, help='lambda')
     parser.add_argument('--gamma', default=0.95, type=float, help='gamma')
-    parser.add_argument('--render', action='store_true', help='Set to true to render the game')
+    parser.add_argument('--render', action='store_false', help='Set to true to render the game')
     parser.add_argument('--keyFir', default=100, type=int, help='The number of keys in the first layer')
     parser.add_argument('--keySec', default=50, type=int, help='The number of keys in the first layer')
     parser.add_argument('--speed', default=5, type=int, help='The number of keys in the first layer')
