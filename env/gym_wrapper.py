@@ -1,17 +1,23 @@
+import time
+import random
 import numpy as np
-from .multiagentenv import MultiAgentEnv
+import mlagents_envs
+from gym.spaces import Box, MultiDiscrete
+from env.multiagentenv import MultiAgentEnv
 from mlagents_envs.environment import UnityEnvironment
 from mlagents_envs.side_channel.environment_parameters_channel import EnvironmentParametersChannel
 from mlagents_envs.side_channel.engine_configuration_channel import (
     EngineConfigurationChannel,
 )
+from mlagents_envs.base_env import ActionTuple
 
 class unityEnv(MultiAgentEnv):
     "The gym wrapper for multi-agent unity environemnt"
     def __init__(self, 
                 bin_path,
-                base_port=5005,
-                worker_id=0,
+                base_port,
+                worker_id,
+                no_graphics,
                 ):
         """
         Create a unity environment 
@@ -26,29 +32,50 @@ class unityEnv(MultiAgentEnv):
         self.engine_config_channel = EngineConfigurationChannel()
         self.parameter_config_channel = EnvironmentParametersChannel()
 
-        self._env = UnityEnvironment(file_name=bin_path, side_channels=[self.engine_config_channel, self.parameter_config_channel], base_port=base_port, worker_id=worker_id )
+        self.worker_id = worker_id
+        self.no_graphics = no_graphics
+
+        port_ = None
+        while True:
+            # Sleep for random time to allow for concurrent startup of many
+            # environments (num_workers >> 1). Otherwise, would lead to port
+            # conflicts sometimes.
+            if port_ is not None:
+                time.sleep(random.randint(1, 10))
+            port_ = base_port 
+            # cache the worker_id and
+            # increase it for the next environment
+            self.worker_id += 1
+            try:
+                self._env = UnityEnvironment(file_name=bin_path, side_channels=[self.engine_config_channel, self.parameter_config_channel], base_port=port_, worker_id=self.worker_id, no_graphics=self.no_graphics)
+                print(
+                    "Created UnityEnvironment for port {}".format(port_ +  self.worker_id))
+            except mlagents_envs.exception.UnityWorkerInUseException:
+                pass
+            else:
+                break
+
         self._env.reset()
 
         # Observation args
         self.behavior_name = list(self._env.behavior_specs._dict.keys())[0]
         self.spec = self._env.behavior_specs[self.behavior_name]
-        self.observation_shape = sum([ each[0] for each in self.spec.observation_shapes])
+
+        self.observation_shape = Box(float("-inf"), float("inf"), self.spec.observation_specs[0].shape)
 
         # Action args
-        self.discrete = self.spec.is_action_discrete()
-        self.action_shape = self.spec.action_shape
+        self.action_shape = MultiDiscrete([3,3,3,2])
 
         # Agent args
         self.decision_steps, self.terminal_steps = self._env.get_steps(self.behavior_name)
         self.n_agents = len(self.decision_steps)
         self.n_agent_ids = self.decision_steps.agent_id
         
-        # Use side channel to config unity env
-        self.cirrculum_param = 50
-        self.set_time_scale()
-        self.set_env_parameters(value=self.cirrculum_param)
+        # # Use side channel to config unity env
+        # self.cirrculum_param = 50
+        # self.set_time_scale()
+        # self.set_env_parameters(value=self.cirrculum_param)
         
-
 
     def _extract_decision_info(self, decision_steps, terminated=False):
         # id -> numpy arry and its length is self.observation_shape
@@ -73,7 +100,8 @@ class unityEnv(MultiAgentEnv):
         # Set action for agents who asked
         
         for ida in actions.keys():
-            self._env.set_action_for_agent(self.behavior_name, ida, np.array(actions[ida]))
+            action4unity =  ActionTuple(continuous=(np.array(actions[ida][:3]) - 1).reshape(1,-1), discrete=np.array(actions[ida][3:]).reshape(1,1))
+            self._env.set_action_for_agent(self.behavior_name, ida, action4unity)
 
         # Execute action
         self._env.step()
@@ -129,6 +157,9 @@ class unityEnv(MultiAgentEnv):
     def set_env_parameters(self, key="checkpoint_radius", value=50):
         print(f"Set {key} to {value}")
         self.parameter_config_channel.set_float_parameter(key, value)
+    
+    def random_action(self, nums):
+        return self.spec.action_spec.random_action(nums)
 
 
 def main():

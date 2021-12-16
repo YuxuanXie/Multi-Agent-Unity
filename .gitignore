@@ -8,3 +8,4 @@ al_linux_Data
 .DS_Store
 log
 results
+*.egg-info
