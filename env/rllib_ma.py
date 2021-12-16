@@ -9,18 +9,21 @@ class Gc(MultiAgentEnv):
             env_path, 
             base_port=5005,
             worker_id=0,
-            no_graphics=True
+            no_graphics=True,
+            numKeyFirst = 100,
+            numKeySecond = 50,
+            time_scale = 5
             ) -> None:
         super().__init__()
 
         self._env = unityEnv(env_path, base_port, worker_id, no_graphics=no_graphics)
         self.num_agents = 4
         self.set_env_params(dict({
-                "numKeyFirst":1000,
-                "numKeySecond":1000,
-                "numFood":1000,
+                "numKeyFirst":numKeyFirst,
+                "numKeySecond":numKeySecond,
+                "numFood":500,
                 }))
-        self._env.set_time_scale(1)
+        self._env.set_time_scale(time_scale)
 
         self.done_agents = []
         self.observation_space = self._env.observation_shape

@@ -11,7 +11,7 @@ import math
 from pdb import set_trace
 import numpy as np
 
-from ray.rllib.models.modelv2 import ModelV2
+from ray.rllib.models.modelv2 import ModelV2, restore_original_dimensions
 from ray.rllib.models.preprocessors import get_preprocessor
 from ray.rllib.models.torch.recurrent_net import RecurrentNetwork as TorchRNN
 from ray.rllib.utils.annotations import override
@@ -80,7 +80,11 @@ class TorchRNNModel(TorchRNN, nn.Module):
         """
         bs = inputs.shape[0]
         seq = inputs.shape[1]
-        inputs = inputs.reshape(-1, self.obs_space.shape[2], *self.obs_space.shape[:2])
+        inputs = inputs.reshape(-1, *self.obs_space.shape)
+        inputs = inputs.permute(0,3,1,2)
+        # inputs = inputs.reshape(-1, self.obs_space.shape[2], *self.obs_space.shape[:2])
+        # if torch.any((torch.sum(inputs, dim=1) > 1)):
+        #     import pdb; pdb.set_trace()
         inputs = self.conv(inputs)
         embeddings = F.relu(self.fc1(inputs.reshape(bs*seq, -1)))
         embeddings = F.relu(self.fc2(embeddings)).reshape(bs, seq, -1)

@@ -1,3 +1,4 @@
+from time import time
 import ray
 import sys
 import argparse
@@ -7,12 +8,12 @@ sys.path.append('..')
 from ray import tune
 from ray.rllib.agents.registry import get_agent_class
 from ray.rllib.agents.ppo.ppo_torch_policy import PPOTorchPolicy as PPOPolicyGraph
+from ray.rllib.agents.ppo.appo_torch_policy import AsyncPPOTorchPolicy
 from ray.rllib.agents.impala.vtrace_torch_policy import VTraceTorchPolicy
 
 from ray.rllib.models import ModelCatalog
 from ray.tune import run_experiments
 from ray.tune.registry import register_env
-from ray.tune.result import DEFAULT_RESULTS_DIR
 
 from env.rllib_ma import Gc
 from model.conv2mlp import TorchRNNModel
@@ -41,19 +42,25 @@ ppo_params = {
     # "batch_mode" : "complete_episodes",
 }
 
-
-impala_params = {
-
+appo_param = {
+    'entropy_coeff': 0.0,
+    'use_gae': True,
+    'kl_coeff': 0.0,
+    "clip_param" : 0.1,
+    "train_batch_size" : 1024,
+    "minibatch_buffer_size" : 512,
+    "num_sgd_iter" : 4,
+    "rollout_fragment_length" : 64,
+    "grad_clip" : 30,
 }
 
 
 def setup(args):
 
     def env_creator(_):
-        return Gc("/Users/yuxuan/git/maUnity/env/unity_envs/GcMaze.app", no_graphics=False)
+        return Gc("/Users/yuxuan/git/maUnity/env/unity_envs/GcMaze.app", no_graphics=args.render, numKeyFirst=args.keyFir, numKeySecond=args.keySec, time_scale=args.speed)
 
     single_env = Gc("/Users/yuxuan/git/maUnity/env/unity_envs/GcMaze.app")
-
     env_name = "gc_env"
     register_env(env_name, env_creator)
 
@@ -65,7 +72,9 @@ def setup(args):
     def gen_policy():
         if args.algorithm == 'PPO':
             return (PPOPolicyGraph, obs_space, act_space, {})
-        else:
+        elif args.algorithm == "APPO":
+            return (AsyncPPOTorchPolicy, obs_space, act_space, {})
+        elif args.algorithm == "IMPALA":
             return (VTraceTorchPolicy, obs_space, act_space, {})
             
 
@@ -138,8 +147,8 @@ def setup(args):
         })
     if args.algorithm == 'PPO':
         config.update(ppo_params)
-    else:
-        config.update(impala_params)
+    elif args.algorithm == 'APPO':
+        config.update(appo_param)
 
     config.update({"callbacks": {
         "on_episode_end": tune.function(on_episode_end),
@@ -159,9 +168,9 @@ def on_episode_end(info):
     #         episode.custom_metrics["total_size{}".format(info["0"]["total_size"][i])] = i+1
 
 def main():
-    parser = argparse.ArgumentParser(description='Rosea training script')
+    parser = argparse.ArgumentParser(description='Training script')
     parser.add_argument('--exp_name', default='gc', help='Name of the ray_results experiment directory where results are stored.')
-    parser.add_argument('--algorithm', default='PPO', help='Name of the rllib algorithm to use.')
+    parser.add_argument('--algorithm', default='APPO', help='Name of the rllib algorithm to use.')
     parser.add_argument('--restore', default='', help='Path to the checkpoint restored.')
     parser.add_argument('--train_batch_size', default=1024, type=int, help='Size of the total dataset over which one epoch is computed.')
     parser.add_argument('--checkpoint_frequency', default=100, type=int, help='Number of steps before a checkpoint is saved.')
@@ -174,6 +183,10 @@ def main():
     parser.add_argument('--num_cpus_for_driver', default=1., type=float, help='Number of workers to place on a single device (CPU or GPU)')
     parser.add_argument('--lam', default=0.95, type=float, help='lambda')
     parser.add_argument('--gamma', default=0.95, type=float, help='gamma')
+    parser.add_argument('--render', action='store_true', help='Set to true to render the game')
+    parser.add_argument('--keyFir', default=100, type=int, help='The number of keys in the first layer')
+    parser.add_argument('--keySec', default=50, type=int, help='The number of keys in the first layer')
+    parser.add_argument('--speed', default=5, type=int, help='The number of keys in the first layer')
 
     args = parser.parse_args()
 
