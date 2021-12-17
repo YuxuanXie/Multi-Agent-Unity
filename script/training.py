@@ -23,8 +23,8 @@ hparams = {
     'lr_final': 1e-5,
 }
 ppo_params = {
-    'entropy_coeff': 0.01,
-    'entropy_coeff_schedule': [[0, 0.01],[50000000, 0.001]],
+    'entropy_coeff': 0.0,
+    # 'entropy_coeff_schedule': [[0, 0.01],[50000000, 0.001]],
     'use_gae': True,
     'kl_coeff': 0.0,
     "clip_param" : 0.1,
@@ -184,8 +184,8 @@ def main():
     parser.add_argument('--lam', default=0.95, type=float, help='lambda')
     parser.add_argument('--gamma', default=0.95, type=float, help='gamma')
     parser.add_argument('--render', action='store_false', help='Set to true to render the game')
-    parser.add_argument('--keyFir', default=100, type=int, help='The number of keys in the first layer')
-    parser.add_argument('--keySec', default=50, type=int, help='The number of keys in the first layer')
+    parser.add_argument('--keyFir', default=200, type=int, help='The number of keys in the first layer')
+    parser.add_argument('--keySec', default=100, type=int, help='The number of keys in the first layer')
     parser.add_argument('--speed', default=5, type=int, help='The number of keys in the first layer')
 
     args = parser.parse_args()
