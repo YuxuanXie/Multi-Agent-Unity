@@ -19,19 +19,19 @@ from env.rllib_ma import Gc
 from model.conv2mlp import TorchRNNModel
 
 hparams = {
-    'lr_init': 5e-5,
+    'lr_init': 1e-5,
     'lr_final': 1e-5,
 }
 ppo_params = {
-    'entropy_coeff': 0.01,
-    'entropy_coeff_schedule': [[0, 0.01],[50000000, 0.001]],
+    'entropy_coeff': 0.0,
+    # 'entropy_coeff_schedule': [[0, 0.01],[50000000, 0.001]],
     'use_gae': True,
     'kl_coeff': 0.0,
     "clip_param" : 0.1,
-    "sgd_minibatch_size" : 1024,
-    "train_batch_size" : 2048,
+    "sgd_minibatch_size" : 256,
+    "train_batch_size" : 1024,
     "num_sgd_iter" : 4,
-    "rollout_fragment_length" : 128,
+    "rollout_fragment_length" : 64,
     "grad_clip" : 30,
     # "sgd_minibatch_size" : 128*5,
     # "train_batch_size" : 5000,
@@ -114,11 +114,11 @@ def setup(args):
 
     # hyperparams
     config.update({
-            "train_batch_size": args.train_batch_size,
+            # "train_batch_size": args.train_batch_size,
             # "horizon": 3 * one_layer_length, # it dosnot make done in step function true
             "lr_schedule":
             [[0, hparams['lr_init']],
-                [2000000, hparams['lr_final']]],
+                [5000000, hparams['lr_final']]],
             "num_workers": num_workers,
             "num_gpus": gpus_for_driver,  # The number of GPUs for the driver
             "num_cpus_for_driver": cpus_for_driver,
@@ -175,14 +175,14 @@ def main():
     parser.add_argument('--train_batch_size', default=1024, type=int, help='Size of the total dataset over which one epoch is computed.')
     parser.add_argument('--checkpoint_frequency', default=100, type=int, help='Number of steps before a checkpoint is saved.')
     parser.add_argument('--training_iterations', default=20000, type=int, help='Total number of steps to train for')
-    parser.add_argument('--num_cpus', default=16, type=int, help='Number of available CPUs')
+    parser.add_argument('--num_cpus', default=32, type=int, help='Number of available CPUs')
     parser.add_argument('--num_gpus', default=0, type=int, help='Number of available GPUs')
     parser.add_argument('--use_gpus_for_workers', action='store_true', help='Set to true to run workers on GPUs rather than CPUs')
     parser.add_argument('--use_gpu_for_driver', action='store_true', help='Set to true to run driver on GPU rather than CPU.')
     parser.add_argument('--num_workers_per_device', default=1., type=float, help='Number of workers to place on a single device (CPU or GPU)')
     parser.add_argument('--num_cpus_for_driver', default=1., type=float, help='Number of workers to place on a single device (CPU or GPU)')
     parser.add_argument('--lam', default=0.95, type=float, help='lambda')
-    parser.add_argument('--gamma', default=0.95, type=float, help='gamma')
+    parser.add_argument('--gamma', default=0.99, type=float, help='gamma')
     parser.add_argument('--render', action='store_false', help='Set to true to render the game')
     parser.add_argument('--keyFir', default=100, type=int, help='The number of keys in the first layer')
     parser.add_argument('--keySec', default=50, type=int, help='The number of keys in the first layer')
@@ -205,7 +205,7 @@ def main():
     if args.exp_name is None:
         exp_name = args.env + '_' + args.algorithm
     else:
-        exp_name = args.exp_name + '/'
+        exp_name = args.exp_name + f'/{args.keyFir}_{args.keySec}/'
 
     print('Commencing experiment', exp_name)
 
