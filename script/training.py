@@ -184,8 +184,8 @@ def main():
     parser.add_argument('--lam', default=0.95, type=float, help='lambda')
     parser.add_argument('--gamma', default=0.99, type=float, help='gamma')
     parser.add_argument('--render', action='store_false', help='Set to true to render the game')
-    parser.add_argument('--keyFir', default=100, type=int, help='The number of keys in the first layer')
-    parser.add_argument('--keySec', default=50, type=int, help='The number of keys in the first layer')
+    parser.add_argument('--keyFir', default=200, type=int, help='The number of keys in the first layer')
+    parser.add_argument('--keySec', default=100, type=int, help='The number of keys in the first layer')
     parser.add_argument('--speed', default=5, type=int, help='The number of keys in the first layer')
 
     args = parser.parse_args()
