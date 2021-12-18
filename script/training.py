@@ -1,3 +1,4 @@
+import random
 from time import time
 import ray
 import sys
@@ -28,8 +29,8 @@ ppo_params = {
     'use_gae': True,
     'kl_coeff': 0.0,
     "clip_param" : 0.1,
-    "sgd_minibatch_size" : 1024,
-    "train_batch_size" : 2048,
+    "sgd_minibatch_size" : 512,
+    "train_batch_size" : 1024,
     "num_sgd_iter" : 4,
     "rollout_fragment_length" : 128,
     "grad_clip" : 30,
@@ -58,7 +59,7 @@ appo_param = {
 def setup(args):
 
     def env_creator(_):
-        return Gc(args.env_path, no_graphics=args.render, numKeyFirst=args.keyFir, numKeySecond=args.keySec, time_scale=args.speed)
+        return Gc(args.env_path, base_port=5005, worker_id=random.randint(0, 3*args.num_cpus * args.num_workers_per_device), no_graphics=args.render, numKeyFirst=args.keyFir, numKeySecond=args.keySec, time_scale=args.speed)
 
     single_env = Gc(args.env_path,)
     env_name = "gc_env"

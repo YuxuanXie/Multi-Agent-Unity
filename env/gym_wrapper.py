@@ -47,9 +47,8 @@ class unityEnv(MultiAgentEnv):
             # increase it for the next environment
             self.worker_id += 1
             try:
-                self._env = UnityEnvironment(file_name=bin_path, side_channels=[self.engine_config_channel, self.parameter_config_channel], base_port=port_, worker_id=self.worker_id, no_graphics=self.no_graphics)
-                print(
-                    "Created UnityEnvironment for port {}".format(port_ +  self.worker_id))
+                self._env = UnityEnvironment(file_name=bin_path, side_channels=[self.engine_config_channel, self.parameter_config_channel], base_port=port_, worker_id=self.worker_id, no_graphics=self.no_graphics, timeout_wait=60*3)
+                print("Created UnityEnvironment for port {}".format(port_ +  self.worker_id))
             except mlagents_envs.exception.UnityWorkerInUseException:
                 pass
             else:
