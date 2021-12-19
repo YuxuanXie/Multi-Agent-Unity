@@ -1,6 +1,6 @@
 from mlagents_envs.environment import UnityEnvironment
 
-env = UnityEnvironment(file_name='./env/GcMaze.app')
+env = UnityEnvironment(file_name='./env/linux/GcMaze.x86_64', no_graphics=True)
 env.reset()
 
 behavior_name = list(env.behavior_specs._dict.keys())[0]
