@@ -37,7 +37,7 @@ class TorchRNNModel(TorchRNN, nn.Module):
         # Holds the current "base" output (before logits layer).
         self._features = None
 
-        self.embeding_size = fc_size if fc_size else [256, 128, 32]
+        self.embeding_size = fc_size if fc_size else [256, 128, 128]
         self.rnn_size = lstm_state_size
         # custom_model_config = model_config["custom_model_config"]
 
@@ -89,7 +89,7 @@ class TorchRNNModel(TorchRNN, nn.Module):
         embeddings = F.relu(self.fc1(inputs.reshape(bs*seq, -1)))
         embeddings = F.relu(self.fc2(embeddings)).reshape(bs, seq, -1)
         core, [h,c] = self.lstm(embeddings, [torch.unsqueeze(state[0], 0), torch.unsqueeze(state[1], 0)])
-        self._features = self.fc3(core)
+        self._features = F.relu(self.fc3(core))
         logits = self.logits(self._features)
         return logits, [torch.squeeze(h, 0), torch.squeeze(c, 0)]
 

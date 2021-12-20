@@ -20,20 +20,21 @@ from env.rllib_ma import Gc
 from model.conv2mlp import TorchRNNModel
 
 hparams = {
-    'lr_init': 9e-6,
-    'lr_final': 9e-6,
+    'lr_init': 1e-5,
+    'lr_final': 1e-5,
 }
 ppo_params = {
-    'entropy_coeff': 0.0,
+    'entropy_coeff': 0.0001,
     # 'entropy_coeff_schedule': [[0, 0.01],[50000000, 0.001]],
     'use_gae': True,
     'kl_coeff': 0.0,
     "clip_param" : 0.1,
-    "sgd_minibatch_size" : 512,
+    "sgd_minibatch_size" : 1024,
     "train_batch_size" : 1024,
-    "num_sgd_iter" : 2,
+    "num_sgd_iter" : 1,
     "rollout_fragment_length" : 64,
-    "grad_clip" : 30,
+    "vf_loss_coeff": 0.1,
+    "grad_clip" : 10,
     # "sgd_minibatch_size" : 128*5,
     # "train_batch_size" : 5000,
     # "num_sgd_iter" : 8,
