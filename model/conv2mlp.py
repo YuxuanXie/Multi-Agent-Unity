@@ -48,7 +48,12 @@ class TorchRNNModel(TorchRNN, nn.Module):
         self.fc3 = torch.nn.Linear(self.rnn_size, self.embeding_size[2])
 
         self.logits = torch.nn.Linear(self.embeding_size[2], num_outputs)
-        self.values = torch.nn.Linear(self.embeding_size[2], 1)
+        # self.values = torch.nn.Linear(self.embeding_size[2], 1)
+        self.values = nn.Sequential(
+            nn.Linear(self.embeding_size[2], 128),
+            nn.Tanh(),
+            nn.Linear(128, 1),
+        )
 
     @override(ModelV2)
     def get_initial_state(self):

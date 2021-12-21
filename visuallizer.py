@@ -56,7 +56,7 @@ def visualizer_rllib(args):
         multiagent = False
 
     def env_creator(_):
-        return Gc("env/unity_envs/GcMaze.app", no_graphics=False, numKeyFirst=100, numKeySecond=50, time_scale=1)
+        return Gc("env/linux/GcMaze.x86_64", no_graphics=False, numKeyFirst=100, numKeySecond=50, time_scale=1)
 
     # Create and register a gym+rllib env
     env_name = config['env_config']['env_name']

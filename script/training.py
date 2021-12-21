@@ -24,7 +24,7 @@ hparams = {
     'lr_final': 1e-5,
 }
 ppo_params = {
-    'entropy_coeff': 0.0001,
+    'entropy_coeff': 0.0000,
     # 'entropy_coeff_schedule': [[0, 0.01],[50000000, 0.001]],
     'use_gae': True,
     'kl_coeff': 0.0,
