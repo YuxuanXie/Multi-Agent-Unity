@@ -22,6 +22,7 @@ from ray.rllib.models import ModelCatalog
 from ray.tune.registry import register_env
 from ray.cloudpickle import cloudpickle
 from ray.rllib.policy.sample_batch import DEFAULT_POLICY_ID
+import time
 
 from model.conv2mlp import TorchRNNModel
 
@@ -115,6 +116,7 @@ def visualizer_rllib(args):
     done = False
     reward_total = 0.0
     while not done and steps < (config['horizon'] or steps + 1):
+        cur_time = time.time() 
         if multiagent:
             action_dict = {}
             for agent_id in state.keys():
@@ -141,13 +143,15 @@ def visualizer_rllib(args):
                     state, state=state_init)
             else:
                 action = agent.compute_action(state)
-
+        print(f"steps = {steps}, compute action = {time.time()-cur_time} ")
+        cur_time = time.time()
         if agent.config["clip_actions"]:
             # clipped_action = clip_action(action, env.action_space)
             next_state, reward, done, info = env.step(action)
         else:
             next_state, reward, done, info = env.step(action)
-        print(steps, action) 
+        # print(steps) 
+        print(f"steps = {steps}, step time = {time.time()-cur_time} ")
         if multiagent:
             done = done["__all__"]
             reward_total += sum(reward.values())
