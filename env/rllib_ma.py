@@ -1,4 +1,4 @@
-from time import sleep
+from time import sleep, time
 
 from numpy import random
 from env.gym_wrapper import unityEnv
@@ -24,7 +24,8 @@ class Gc(MultiAgentEnv):
                 "numKeySecond":numKeySecond,
                 "numFood":500,
                 }))
-        self._env.set_time_scale(time_scale)
+        if time_scale >= 1:
+            self._env.set_time_scale(time_scale=time_scale)
 
         self.done_agents = []
         self.observation_space = self._env.observation_shape
@@ -71,7 +72,7 @@ class Gc(MultiAgentEnv):
 
 
 if __name__ == "__main__":
-    gc = Gc("./unity_envs/GcMaze.app")
+    gc = Gc("./unity_envs/GcMaze100_slow.app", no_graphics=False, time_scale=0.01)
     obs = gc.reset()
     for _ in range(1000):
         actions = {}
