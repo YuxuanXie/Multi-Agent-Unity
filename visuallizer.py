@@ -57,7 +57,7 @@ def visualizer_rllib(args):
         multiagent = False
 
     def env_creator(_):
-        return Gc("env/unity_envs/GcMaze100_slow.app", no_graphics=False, numKeyFirst=100, numKeySecond=50, time_scale=0.01)
+        return Gc("env/unity_envs/GcMaze100_slow.app", no_graphics=False, numKeyFirst=args.num_first, numKeySecond=args.num_second, time_scale=0.1)
 
     # Create and register a gym+rllib env
     env_name = config['env_config']['env_name']
@@ -87,6 +87,8 @@ def visualizer_rllib(args):
 
     # create the agent that will be used to compute the actions
     config['sample_collector'] = None
+    config['num_gpus'] = 0
+    config['num_gpus_per_worker'] = 0
     agent = agent_cls(env=env_name, config=config)
 
     checkpoint = result_dir + '/checkpoint_' + f'{int(args.checkpoint_num):06d}'
@@ -173,6 +175,9 @@ def create_parser():
     # required input parameters
     parser.add_argument('result_dir', type=str, help='Directory containing results')
     parser.add_argument('checkpoint_num', type=str, help='Checkpoint number.')
+    parser.add_argument('num_first', type=int, help='Checkpoint number.')
+    parser.add_argument('num_second', type=int, help='Checkpoint number.')
+
 
     return parser
 
@@ -183,13 +188,6 @@ if __name__ == '__main__':
     ray.init(num_cpus=2)
     visualizer_rllib(args)
 
-
-# if __name__ == '__main__':
-#     parser = argparse.ArgumentParser(description='arguments')
-#     parser.add_argument('--binPath', type=str, default='./env/visuallizer.app')
-#     parser.add_argument('--checkpoint', type=str, default='results/model/2021-10-17-11-59-50/900000.pth')
-#     args = parser.parse_args()
-#     main(args)
 
 
 
